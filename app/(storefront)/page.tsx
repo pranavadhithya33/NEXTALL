@@ -133,8 +133,8 @@ function HomeContent() {
                       </div>
                     </div>
                     <div className="p-4 flex flex-col flex-grow">
-                      <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">{product.brand}</div>
-                      <h3 className="font-medium text-white mb-2 line-clamp-2 leading-snug group-hover:text-cyan-400 transition-colors flex-grow">
+                      <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider line-clamp-1">{product.brand}</div>
+                      <h3 className="font-medium text-white mb-2 line-clamp-3 leading-snug group-hover:text-cyan-400 transition-colors flex-grow overflow-hidden">
                         {product.name}
                       </h3>
                       <div className="mt-auto">
