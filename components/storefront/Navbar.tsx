@@ -138,7 +138,13 @@ export function Navbar() {
           
           {/* Premium Sidebar */}
           <div 
-            className="fixed left-0 top-0 bottom-0 z-[999] w-[300px] bg-[#0B0F19] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden overflow-hidden"
+            className="fixed left-0 top-0 bottom-0 z-[999] w-[300px] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden overflow-hidden"
+            style={{ 
+              backgroundColor: '#0B0F19', 
+              background: '#0B0F19', 
+              opacity: '1', 
+              backdropFilter: 'none' 
+            }}
           >
             {/* Header / Profile Section */}
             <div className="p-6 border-b border-white/10">
