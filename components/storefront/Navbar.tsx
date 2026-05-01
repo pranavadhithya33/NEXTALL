@@ -95,17 +95,14 @@ export function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 z-[999] bg-[#000000f2] backdrop-blur-md md:hidden" 
+          className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm md:hidden" 
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <div 
-            className="absolute left-0 top-0 bottom-0 w-[280px] shadow-2xl flex flex-col slide-in border-r border-white/10 overflow-hidden"
+            className="absolute left-0 top-0 bottom-0 w-[280px] bg-[#0A0E1A] shadow-2xl flex flex-col slide-in border-r border-white/10"
             onClick={e => e.stopPropagation()}
+            style={{ backgroundColor: '#0A0E1A', opacity: 1 }}
           >
-            {/* Solid Background Shield */}
-            <div className="absolute inset-0 bg-[#0A0E1A] z-0" />
-            
-            <div className="relative z-10 flex flex-col h-full">
             <div className="flex justify-between items-center p-4 border-b border-white/10">
               <span className="text-xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white">
@@ -131,17 +128,22 @@ export function Navbar() {
               )}
             </div>
 
-            <div className="flex flex-col flex-1 p-4 gap-2">
+            <div className="flex flex-col flex-1 p-4 gap-2 overflow-y-auto">
               <Link href="/" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
               <Link href="/track" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Track Order</Link>
               {isLoggedIn && (
                 <Link href="/orders" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
               )}
+              
               <div className="my-2 border-t border-white/10"></div>
-              <Link href="/category/smartphones" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartphones</Link>
-              <Link href="/category/tablets" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Tablets</Link>
-              <Link href="/category/laptops" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Laptops</Link>
-              <Link href="/category/audio" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Audio & Wearables</Link>
+              <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-widest">Categories</div>
+              
+              <Link href="/category/smartphones" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartphones</Link>
+              <Link href="/category/laptops" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Laptops</Link>
+              <Link href="/category/tablets" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Tablets</Link>
+              <Link href="/category/audio" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Audio & Wearables</Link>
+              <Link href="/category/smartwatches" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartwatches</Link>
+              <Link href="/category/accessories" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Accessories</Link>
             </div>
 
             {isLoggedIn && (
@@ -151,7 +153,6 @@ export function Navbar() {
                 </button>
               </div>
             )}
-          </div>
           </div>
         </div>
       )}
