@@ -92,16 +92,19 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm md:hidden" 
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
+        <>
+          {/* Dark Blurred Overlay (Sibling) */}
           <div 
-            className="absolute left-0 top-0 bottom-0 w-[280px] bg-[#0A0E1A] shadow-2xl flex flex-col slide-in border-r border-white/10"
-            onClick={e => e.stopPropagation()}
-            style={{ backgroundColor: '#0A0E1A', opacity: 1 }}
+            className="fixed inset-0 z-[998] bg-black/80 backdrop-blur-md md:hidden" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Solid Sidebar (Sibling) */}
+          <div 
+            className="fixed left-0 top-0 bottom-0 z-[999] w-[280px] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden"
+            style={{ backgroundColor: '#0A0E1A', background: '#0A0E1A', opacity: 1 }}
           >
             <div className="flex justify-between items-center p-4 border-b border-white/10">
               <span className="text-xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
@@ -154,7 +157,7 @@ export function Navbar() {
               </div>
             )}
           </div>
-        </div>
+        </>
       )}
     </nav>
   );
