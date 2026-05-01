@@ -161,8 +161,8 @@ function HomeContent() {
                         onClick={(e) => toggleWishlist(e, product)}
                         className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-md transition-all z-20 ${
                           isInWishlist(product.id) 
-                          ? 'bg-red-500/20 text-red-500 border border-red-500/30' 
-                          : 'bg-black/10 text-gray-400 hover:text-white border border-transparent'
+                          ? 'bg-red-500/40 text-red-500 border border-red-500/30' 
+                          : 'bg-black/40 text-white/70 hover:text-white border border-white/10'
                         }`}
                       >
                         <Heart size={16} className={isInWishlist(product.id) ? 'fill-current' : ''} />
