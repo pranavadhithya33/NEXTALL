@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { useCartStore } from '@/store/cart';
 import { useUserStore } from '@/store/user';
+import { useWishlistStore } from '@/store/wishlist';
 import { Button } from '@/components/ui/button';
 
 export function Navbar() {
@@ -18,6 +19,11 @@ export function Navbar() {
   const items = useCartStore(state => state.items);
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
   const { isLoggedIn, user, clearUser } = useUserStore();
+
+  const wishlistItems = useWishlistStore(state => state.items);
+  const wishlistCount = wishlistItems.length;
+
+  const waNumber = "919876543210"; // From .env or default
 
   const menuItems = [
     {
@@ -31,14 +37,14 @@ export function Navbar() {
     {
       group: "ACCOUNT",
       items: [
-        { icon: Heart, label: "Wishlist", href: "/wishlist" },
+        { icon: Heart, label: `Wishlist (${wishlistCount})`, href: "/wishlist" },
       ]
     },
     {
       group: "SUPPORT",
       items: [
-        { icon: HelpCircle, label: "Help Center", href: "/help" },
-        { icon: Phone, label: "Contact Us", href: "/contact" },
+        { icon: HelpCircle, label: "Help Center", href: `https://wa.me/${waNumber}?text=Hi, I need help with...` },
+        { icon: Phone, label: "Contact Us", href: `https://wa.me/${waNumber}?text=Hi, I want to contact support.` },
       ]
     }
   ];

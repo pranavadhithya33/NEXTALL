@@ -9,6 +9,9 @@ import { Product } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useInView } from 'react-intersection-observer';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Heart } from 'lucide-react';
+import { useWishlistStore } from '@/store/wishlist';
+import toast from 'react-hot-toast';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
@@ -128,6 +131,19 @@ function HomeContent() {
                           unoptimized 
                         />
                       )}
+                      
+                      {/* Heart Button */}
+                      <button 
+                        onClick={(e) => toggleWishlist(e, product)}
+                        className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-md transition-all z-20 ${
+                          isInWishlist(product.id) 
+                          ? 'bg-red-500/20 text-red-500 border border-red-500/30' 
+                          : 'bg-black/10 text-gray-400 hover:text-white border border-transparent'
+                        }`}
+                      >
+                        <Heart size={16} className={isInWishlist(product.id) ? 'fill-current' : ''} />
+                      </button>
+
                       <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                         -{Math.round(((product.original_price - product.prepaid_price) / product.original_price) * 100)}%
                       </div>
