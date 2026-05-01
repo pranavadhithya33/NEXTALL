@@ -1,7 +1,13 @@
 "use client";
 
 import Link from 'next/link';
-import { ShoppingCart, Search, Menu, User, X } from 'lucide-react';
+import { 
+  ShoppingCart, Search, Menu, User, X, 
+  Home, Package, Truck, LayoutGrid, 
+  Heart, Settings, LogOut, MapPin, 
+  CreditCard, HelpCircle, Phone, Info,
+  ChevronRight
+} from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cart';
 import { useUserStore } from '@/store/user';
@@ -12,6 +18,35 @@ export function Navbar() {
   const items = useCartStore(state => state.items);
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
   const { isLoggedIn, user, clearUser } = useUserStore();
+
+  const menuItems = [
+    {
+      group: "SHOP",
+      items: [
+        { icon: Home, label: "Home", href: "/" },
+        { icon: Package, label: "Orders", href: "/orders" },
+        { icon: Truck, label: "Track Order", href: "/track" },
+        { icon: LayoutGrid, label: "Category", href: "/#categories" },
+      ]
+    },
+    {
+      group: "ACCOUNT",
+      items: [
+        { icon: User, label: "My Account", href: isLoggedIn ? "/profile" : "/login" },
+        { icon: Heart, label: "Wishlist", href: "/wishlist" },
+        { icon: MapPin, label: "Addresses", href: "/addresses" },
+        { icon: CreditCard, label: "Payment Methods", href: "/payments" },
+      ]
+    },
+    {
+      group: "SUPPORT",
+      items: [
+        { icon: HelpCircle, label: "Help Center", href: "/help" },
+        { icon: Phone, label: "Contact Us", href: "/contact" },
+        { icon: Info, label: "About Us", href: "/about" },
+      ]
+    }
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-[#0A0E1A]/90 backdrop-blur-xl border-b border-white/10 text-white">
@@ -95,63 +130,81 @@ export function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <>
-          {/* Dark Blurred Overlay (Sibling) */}
+          {/* Dark Blurred Overlay */}
           <div 
             className="fixed inset-0 z-[998] bg-black/80 backdrop-blur-md md:hidden" 
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
-          {/* Solid Sidebar (Sibling) */}
+          {/* Premium Sidebar */}
           <div 
-            className="fixed left-0 top-0 bottom-0 z-[999] w-[280px] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden"
-            style={{ backgroundColor: '#0A0E1A', background: '#0A0E1A', opacity: 1 }}
+            className="fixed left-0 top-0 bottom-0 z-[999] w-[300px] bg-[#0B0F19] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden overflow-hidden"
           >
-            <div className="flex justify-between items-center p-4 border-b border-white/10">
-              <span className="text-xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="p-4 border-b border-white/10">
+            {/* Header / Profile Section */}
+            <div className="p-6 border-b border-white/10">
+              <div className="flex justify-between items-center mb-8">
+                <span className="text-2xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg">
+                  <X size={20} />
+                </button>
+              </div>
+              
               {isLoggedIn ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center font-bold text-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center font-bold text-xl border border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
                     {user?.full_name[0].toUpperCase()}
                   </div>
-                  <div>
-                    <div className="font-medium">{user?.full_name}</div>
-                    <div className="text-xs text-gray-400">{user?.email}</div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-white truncate">{user?.full_name}</div>
+                    <div className="text-xs text-gray-500 truncate">{user?.email}</div>
                   </div>
                 </div>
               ) : (
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl">Sign In / Register</Button>
+                  <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl h-12 font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                    Sign In / Register
+                  </Button>
                 </Link>
               )}
             </div>
 
-            <div className="flex flex-col flex-1 p-4 gap-2 overflow-y-auto">
-              <Link href="/" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-              <Link href="/track" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Track Order</Link>
-              {isLoggedIn && (
-                <Link href="/orders" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
-              )}
-              
-              <div className="my-2 border-t border-white/10"></div>
-              <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-widest">Categories</div>
-              
-              <Link href="/category/smartphones" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartphones</Link>
-              <Link href="/category/laptops" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Laptops</Link>
-              <Link href="/category/tablets" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Tablets</Link>
-              <Link href="/category/audio" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Audio & Wearables</Link>
-              <Link href="/category/smartwatches" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartwatches</Link>
-              <Link href="/category/accessories" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Accessories</Link>
+            {/* Menu Sections */}
+            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+              {menuItems.map((section, idx) => (
+                <div key={idx} className="space-y-3">
+                  <div className="px-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
+                    {section.group}
+                  </div>
+                  <div className="space-y-1">
+                    {section.items.map((item, i) => (
+                      <Link 
+                        key={i} 
+                        href={item.href} 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-between group px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-white/[0.03] rounded-xl group-hover:bg-cyan-500/10 group-hover:text-cyan-400 transition-colors">
+                            <item.icon size={20} strokeWidth={1.5} />
+                          </div>
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <ChevronRight size={16} className="text-gray-600 group-hover:text-cyan-400 transition-colors" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
+            {/* Sign Out Section */}
             {isLoggedIn && (
-              <div className="p-4 border-t border-white/10">
-                <button onClick={() => { clearUser(); setIsMobileMenuOpen(false); }} className="w-full py-3 text-center text-red-400 font-medium hover:bg-red-400/10 rounded-xl transition-colors">
+              <div className="p-6 border-t border-white/10 bg-white/[0.02]">
+                <button 
+                  onClick={() => { clearUser(); setIsMobileMenuOpen(false); }} 
+                  className="w-full flex items-center justify-center gap-3 py-4 text-red-400 font-bold hover:bg-red-400/10 rounded-2xl transition-all duration-200 border border-red-400/10"
+                >
+                  <LogOut size={20} />
                   Sign Out
                 </button>
               </div>
