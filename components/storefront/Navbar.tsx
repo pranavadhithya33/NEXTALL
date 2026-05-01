@@ -57,6 +57,13 @@ export function Navbar() {
                       <div className="font-medium text-white">{user?.full_name}</div>
                       <div className="text-xs text-gray-400 truncate">{user?.email}</div>
                     </div>
+                    <div className="p-2 border-b border-white/10">
+                      <Link href="/orders">
+                        <button className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                          My Orders
+                        </button>
+                      </Link>
+                    </div>
                     <div className="p-2">
                       <button onClick={clearUser} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors">
                         Sign Out
@@ -117,6 +124,9 @@ export function Navbar() {
             <div className="flex flex-col flex-1 p-4 gap-2">
               <Link href="/" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
               <Link href="/track" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>Track Order</Link>
+              {isLoggedIn && (
+                <Link href="/orders" className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+              )}
               <div className="my-2 border-t border-white/10"></div>
               <Link href="/category/smartphones" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Smartphones</Link>
               <Link href="/category/tablets" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Tablets</Link>
