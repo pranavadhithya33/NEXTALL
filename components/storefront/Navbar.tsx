@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   ShoppingCart, Search, Menu, User, X, 
   Home, Package, Truck, LayoutGrid, 
-  Heart, Settings, LogOut, MapPin, 
+  Heart, LogOut, MapPin, 
   CreditCard, HelpCircle, Phone, Info,
   ChevronRight
 } from 'lucide-react';
@@ -49,7 +49,7 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#0A0E1A]/90 backdrop-blur-xl border-b border-white/10 text-white">
+    <nav className="sticky top-0 z-50 bg-[#0A0E1A] border-b border-white/10 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo & Menu (Mobile) */}
@@ -127,58 +127,53 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - NEW FAILSAFE STRUCTURE */}
       {isMobileMenuOpen && (
-        <>
-          {/* Dark Blurred Overlay */}
+        <div className="fixed inset-0 z-[9999] md:hidden">
+          {/* Black Shield Overlay (Pure Solid) */}
           <div 
-            className="fixed inset-0 z-[998] bg-black/80 backdrop-blur-md md:hidden" 
+            className="absolute inset-0 bg-black/90" 
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
-          {/* Premium Sidebar */}
+          {/* Solid Sidebar Container */}
           <div 
-            className="fixed left-0 top-0 bottom-0 z-[999] w-[300px] shadow-2xl flex flex-col slide-in border-r border-white/10 md:hidden overflow-hidden"
-            style={{ 
-              backgroundColor: '#0B0F19', 
-              background: '#0B0F19', 
-              opacity: '1', 
-              backdropFilter: 'none' 
-            }}
+            className="absolute left-0 top-0 bottom-0 w-[300px] bg-[#0B0F19] shadow-2xl flex flex-col slide-in border-r border-white/10"
+            style={{ backgroundColor: '#0B0F19' }}
           >
-            {/* Header / Profile Section */}
-            <div className="p-6 border-b border-white/10">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10 bg-[#111827]">
               <div className="flex justify-between items-center mb-8">
-                <span className="text-2xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg">
+                <span className="text-2xl font-display font-bold text-white">NEXT<span className="text-cyan-400">ALL</span></span>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg border border-white/10">
                   <X size={20} />
                 </button>
               </div>
               
               {isLoggedIn ? (
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center font-bold text-xl border border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                  <div className="w-12 h-12 bg-cyan-500 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg shadow-cyan-500/20">
                     {user?.full_name[0].toUpperCase()}
                   </div>
                   <div className="min-w-0">
                     <div className="font-bold text-white truncate">{user?.full_name}</div>
-                    <div className="text-xs text-gray-500 truncate">{user?.email}</div>
+                    <div className="text-xs text-gray-400 truncate">{user?.email}</div>
                   </div>
                 </div>
               ) : (
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl h-12 font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                  <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl h-12 font-bold shadow-lg shadow-cyan-500/20">
                     Sign In / Register
                   </Button>
                 </Link>
               )}
             </div>
 
-            {/* Menu Sections */}
-            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+            {/* Menu Items */}
+            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8 bg-[#0B0F19]">
               {menuItems.map((section, idx) => (
                 <div key={idx} className="space-y-3">
-                  <div className="px-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
+                  <div className="px-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                     {section.group}
                   </div>
                   <div className="space-y-1">
@@ -187,15 +182,15 @@ export function Navbar() {
                         key={i} 
                         href={item.href} 
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-between group px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all duration-200"
+                        className="flex items-center justify-between group px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent hover:border-white/5"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="p-2 bg-white/[0.03] rounded-xl group-hover:bg-cyan-500/10 group-hover:text-cyan-400 transition-colors">
-                            <item.icon size={20} strokeWidth={1.5} />
+                          <div className="p-2 bg-white/5 rounded-xl group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-colors">
+                            <item.icon size={20} strokeWidth={2} />
                           </div>
                           <span className="font-medium">{item.label}</span>
                         </div>
-                        <ChevronRight size={16} className="text-gray-600 group-hover:text-cyan-400 transition-colors" />
+                        <ChevronRight size={16} className="text-gray-600 group-hover:text-cyan-400" />
                       </Link>
                     ))}
                   </div>
@@ -203,12 +198,12 @@ export function Navbar() {
               ))}
             </div>
 
-            {/* Sign Out Section */}
+            {/* Bottom Footer */}
             {isLoggedIn && (
-              <div className="p-6 border-t border-white/10 bg-white/[0.02]">
+              <div className="p-6 border-t border-white/10 bg-[#111827]">
                 <button 
                   onClick={() => { clearUser(); setIsMobileMenuOpen(false); }} 
-                  className="w-full flex items-center justify-center gap-3 py-4 text-red-400 font-bold hover:bg-red-400/10 rounded-2xl transition-all duration-200 border border-red-400/10"
+                  className="w-full flex items-center justify-center gap-3 py-4 text-red-400 font-bold hover:bg-red-400/10 rounded-2xl transition-all border border-red-400/20"
                 >
                   <LogOut size={20} />
                   Sign Out
@@ -216,7 +211,7 @@ export function Navbar() {
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </nav>
   );
