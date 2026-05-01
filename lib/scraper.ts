@@ -43,12 +43,11 @@ async function fetchWithRetry(url: string, attempt = 1): Promise<string> {
     const response = await axios.get(url, {
       headers,
       timeout: 20000,
-      validateStatus: (status) => status < 500, // Handle 404/403 as potential block cases
+      validateStatus: (status) => status < 500,
     });
     
     let html = response.data;
     
-    // Check if Amazon returned a CAPTCHA page or a block
     if (html.includes('Type the characters you see in this image') || 
         html.includes('robot check') ||
         html.includes('validateCaptcha') ||
@@ -96,8 +95,7 @@ export interface ScrapedProduct {
   description: string;
   specs: Record<string, string>;
   amazon_url: string;
-  asin: string;
-  stock: number;
+  in_stock: boolean;
 }
 
 export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduct> {
@@ -105,7 +103,6 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
   const html = await fetchWithRetry(cleanUrl);
   const $ = cheerio.load(html);
 
-  // ── 1. EXTRACT TITLE ────────────────────────────────────────────────
   const name = (
     $('#productTitle').text().trim() ||
     $('h1.a-spacing-none span').first().text().trim() ||
@@ -115,10 +112,9 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
   ).replace(/\s+/g, ' ');
 
   if (!name || name === 'Amazon Product') {
-    throw new Error('Could not extract product name. The page may have changed or is blocked.');
+    throw new Error('Could not extract product name.');
   }
 
-  // ── 2. EXTRACT PRICE ──────────────────────────────────────────
   const rawPrice =
     $('.a-price-whole').first().text().replace(/[^0-9]/g, '') ||
     $('#corePrice_feature_div .a-offscreen').first().text().replace(/[^0-9]/g, '') ||
@@ -128,26 +124,23 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
 
   let original_price = rawPrice ? parseInt(rawPrice, 10) : 0;
 
-  // Regex fallback if selectors fail
   if (!original_price) {
     const m = html.match(/"priceAmount":"([0-9.]+)"/) || html.match(/₹\s*([0-9,]+)/);
     if (m) original_price = parseFloat(m[1].replace(/,/g, ''));
   }
 
   if (!original_price || isNaN(original_price)) {
-    throw new Error('Could not extract product price. Amazon may be hiding it or the selector changed.');
+    throw new Error('Could not extract product price.');
   }
 
   const our_price = Math.round(original_price * 0.90);
   const prepaid_price = Math.max(0, our_price - 1000);
 
-  // ── 3. EXTRACT IMAGES (HI-RES) ──────────────────────────────────────
   const images: string[] = [];
   const seenUrls = new Set<string>();
 
   const addImage = (src: string) => {
     if (!src || src.includes('gif') || src.includes('pixel') || src.length < 20) return;
-    // Upgrade to 1500px high-res version
     const hiRes = src.replace(/\._[A-Z0-9_,]+_\./g, '._SL1500_.').replace(/\._AC_[A-Z0-9_,]+_/, '._AC_SL1500_');
     if (!seenUrls.has(hiRes)) {
       seenUrls.add(hiRes);
@@ -155,28 +148,14 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
     }
   };
 
-  // Main image
   const mainImg = $('#landingImage').attr('data-old-hires') || $('#landingImage').attr('src') || $('#imgBlkFront').attr('src');
   if (mainImg) addImage(mainImg);
 
-  // Carousel thumbnails
   $('li.a-spacing-small.item img, #altImages li img').each((_, el) => {
     const src = $(el).attr('data-old-hires') || $(el).attr('src');
     if (src) addImage(src);
   });
 
-  // Script-based fallback for images
-  const allScripts = $('script').toArray().map(s => $(s).html() || '');
-  for (const script of allScripts) {
-    if (script.includes('"hiRes"') || script.includes('"large"')) {
-      const hiResMatches = [...script.matchAll(/"hiRes"\s*:\s*"(https:[^"]+)"/g)];
-      hiResMatches.forEach(m => addImage(m[1]));
-    }
-  }
-
-  if (images.length === 0) throw new Error('Could not extract product images.');
-
-  // ── 4. EXTRACT DESCRIPTION ─────────────────────────────────────────
   const bullets: string[] = [];
   $('#feature-bullets ul li span.a-list-item').each((_, el) => {
     const text = $(el).text().trim().replace(/\s+/g, ' ');
@@ -186,7 +165,6 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
   });
   const description = bullets.slice(0, 10).join('\n') || name;
 
-  // ── 5. SPECIFICATIONS ────────────────────────────────────────────
   const specs: Record<string, string> = {};
   const specTableSelectors = [
     '#productDetails_techSpec_section_1 tr',
@@ -204,7 +182,6 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
     });
   }
 
-  // ── 6. BRAND & CATEGORY ──────────────────────────────────────────
   const brand = (
     specs['Brand'] ||
     specs['Manufacturer'] ||
@@ -223,10 +200,8 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
   else if (breadcrumbText.includes('audio') || nameLower.includes('buds')) category = 'Audio';
   else if (breadcrumbText.includes('accessories')) category = 'Accessories';
 
-  // ── 7. STOCK & ASIN ─────────────────────────────────────────────────
   const availability = $('#availability span').text().trim().toLowerCase();
   const isOut = availability.includes('unavailable') || availability.includes('out of stock');
-  const asinMatch = rawUrl.match(/\/dp\/([A-Z0-9]{10})/);
 
   return {
     name,
@@ -239,12 +214,10 @@ export async function scrapeAmazonProduct(rawUrl: string): Promise<ScrapedProduc
     description,
     specs,
     amazon_url: cleanUrl,
-    asin: asinMatch ? asinMatch[1] : 'AMAZON',
-    stock: isOut ? 0 : 20,
+    in_stock: !isOut,
   };
 }
 
-// Clean Flipkart URL
 function cleanFlipkartUrl(rawUrl: string): string {
   try {
     const url = new URL(rawUrl);
@@ -262,6 +235,7 @@ export async function scrapeFlipkartProduct(rawUrl: string): Promise<ScrapedProd
   const name = (
     $('span.B_NuCI').text().trim() ||
     $('span.VU-Z7G').text().trim() ||
+    $('.yhB1nd').text().trim() ||
     $('h1').text().trim()
   ).replace(/\s+/g, ' ');
 
@@ -270,7 +244,8 @@ export async function scrapeFlipkartProduct(rawUrl: string): Promise<ScrapedProd
   const priceText = (
     $('.Nx9bqj._4b5DiR').first().text() ||
     $('._30jeq3._16Jk6d').first().text() ||
-    $('._30jeq3').first().text()
+    $('._30jeq3').first().text() ||
+    $('.Nx9bqj').first().text()
   ).replace(/[₹,\s]/g, '');
 
   const original_price = parseFloat(priceText) || 0;
@@ -324,8 +299,7 @@ export async function scrapeFlipkartProduct(rawUrl: string): Promise<ScrapedProd
     description: bullets.join('\n'),
     specs,
     amazon_url: cleanUrl,
-    asin: 'FLIPKART',
-    stock: 20,
+    in_stock: true,
   };
 }
 
@@ -335,6 +309,6 @@ export async function scrapeProduct(url: string): Promise<ScrapedProduct> {
   } else if (url.includes('flipkart.com')) {
     return scrapeFlipkartProduct(url);
   } else {
-    throw new Error('❌ Unsupported URL. Only Amazon.in and Flipkart.com are supported.');
+    throw new Error('❌ Unsupported URL.');
   }
 }

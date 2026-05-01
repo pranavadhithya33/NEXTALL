@@ -45,7 +45,20 @@ export async function POST(request: Request) {
       product.slug = finalSlug;
     }
 
-    const { data, error } = await supabase.from('products').insert([product]).select().single();
+    // Sanitize product object to only include valid DB columns
+    const validColumns = [
+      'name', 'slug', 'description', 'category', 'brand', 
+      'amazon_url', 'original_price', 'our_price', 'prepaid_price', 
+      'images', 'specs', 'in_stock'
+    ];
+    const sanitizedProduct: any = {};
+    validColumns.forEach(col => {
+      if (product[col] !== undefined) {
+        sanitizedProduct[col] = product[col];
+      }
+    });
+
+    const { data, error } = await supabase.from('products').insert([sanitizedProduct]).select().single();
 
     if (error) throw error;
     return NextResponse.json({ success: true, product: data });
