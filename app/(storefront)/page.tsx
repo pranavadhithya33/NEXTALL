@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, Suspense } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import axios from 'axios';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const CATEGORIES = ['All', 'Smartphones', 'Laptops', 'Tablets', 'Audio', 'Smartwatches', 'Accessories'];
 
-export default function HomePage() {
+function HomeContent() {
   const { ref, inView } = useInView();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -162,5 +162,17 @@ export default function HomePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#0A0E1A]">
+        <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
