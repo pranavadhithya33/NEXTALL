@@ -5,7 +5,7 @@ import { useWishlistStore } from '@/store/wishlist';
 import { useCartStore } from '@/store/cart';
 import { Trash2, ShoppingCart, Heart, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 
 export default function WishlistPage() {
   const { items, removeItem } = useWishlistStore();
@@ -13,12 +13,14 @@ export default function WishlistPage() {
 
   const handleAddToCart = (item: any) => {
     addItemToCart({
-      id: item.id,
+      product_id: item.id,
+      slug: item.slug,
       name: item.name,
-      price: item.price,
+      original_price: item.original_price,
+      our_price: item.our_price,
+      prepaid_price: item.prepaid_price,
       image: item.image,
-      quantity: 1,
-      brand: item.brand
+      quantity: 1
     });
     toast.success("Added to cart!");
   };
@@ -62,7 +64,7 @@ export default function WishlistPage() {
                 className="group relative bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300"
               >
                 {/* Image */}
-                <Link href={`/product/${item.id}`} className="block aspect-square overflow-hidden bg-white/5">
+                <Link href={`/product/${item.slug}`} className="block aspect-square overflow-hidden bg-white/5">
                   <img 
                     src={item.image} 
                     alt={item.name}
@@ -73,7 +75,7 @@ export default function WishlistPage() {
                 {/* Content */}
                 <div className="p-5">
                   <div className="text-xs text-gray-500 uppercase tracking-widest mb-1">{item.brand}</div>
-                  <Link href={`/product/${item.id}`}>
+                  <Link href={`/product/${item.slug}`}>
                     <h3 className="font-bold text-white line-clamp-2 mb-4 group-hover:text-cyan-400 transition-colors">
                       {item.name}
                     </h3>
@@ -81,7 +83,7 @@ export default function WishlistPage() {
                   
                   <div className="flex items-center justify-between mt-auto">
                     <div className="text-xl font-display font-bold text-cyan-400">
-                      ₹{item.price.toLocaleString('en-IN')}
+                      ₹{item.prepaid_price.toLocaleString('en-IN')}
                     </div>
                     <div className="flex items-center gap-2">
                       <button 

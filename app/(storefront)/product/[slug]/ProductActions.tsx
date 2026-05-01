@@ -43,8 +43,11 @@ export function ProductActions({ product }: { product: Product }) {
     } else {
       addToWishlist({
         id: product.id,
+        slug: product.slug,
         name: product.name,
-        price: product.our_price,
+        original_price: product.original_price,
+        our_price: product.our_price,
+        prepaid_price: product.prepaid_price,
         image: product.images[0] || '',
         brand: product.brand,
         category: product.category

@@ -54,6 +54,30 @@ function HomeContent() {
     }
   };
 
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
+
+  const toggleWishlist = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast.success('Removed from wishlist');
+    } else {
+      addToWishlist({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        original_price: product.original_price,
+        our_price: product.our_price,
+        prepaid_price: product.prepaid_price,
+        image: product.images[0] || '',
+        brand: product.brand,
+        category: product.category
+      });
+      toast.success('Added to wishlist');
+    }
+  };
+
   return (
     <div className="pb-24">
       {/* Hero Section */}

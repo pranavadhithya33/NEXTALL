@@ -3,8 +3,11 @@ import { persist } from 'zustand/middleware';
 
 export interface WishlistItem {
   id: string;
+  slug: string;
   name: string;
-  price: number;
+  original_price: number;
+  our_price: number;
+  prepaid_price: number;
   image: string;
   brand?: string;
   category?: string;
