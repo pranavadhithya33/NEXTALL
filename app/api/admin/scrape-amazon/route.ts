@@ -6,9 +6,12 @@ import axios from 'axios';
 import { z } from 'zod';
 
 const requestSchema = z.object({
-  url: z.string().url().refine((val) => val.includes('amazon.in'), {
-    message: "URL must be an amazon.in link",
-  }),
+  url: z.string().url().refine(
+    (val) => val.includes('amazon.in') && /\/dp\/[A-Z0-9]{10}/i.test(val),
+    {
+      message: "❌ That's a search results page URL. Please open a specific product on Amazon, then copy the URL from your browser address bar. It must contain /dp/ in it.",
+    }
+  ),
 });
 
 async function reuploadImageToSupabase(
@@ -20,19 +23,22 @@ async function reuploadImageToSupabase(
   try {
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
-      timeout: 10000,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' },
+      timeout: 15000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)',
+        'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+        'Referer': 'https://www.amazon.in/',
+      },
     });
 
     const buffer = Buffer.from(response.data);
     const contentType = String(response.headers['content-type'] || 'image/jpeg');
     const ext = contentType.includes('png') ? 'png' : 'jpg';
     const fileName = `${productSlug}-${index + 1}-${Date.now()}.${ext}`;
-    const filePath = `${fileName}`; // bucket root
 
     const { error } = await supabase.storage
       .from('product-images')
-      .upload(filePath, buffer, {
+      .upload(fileName, buffer, {
         contentType,
         upsert: true,
       });
@@ -42,7 +48,7 @@ async function reuploadImageToSupabase(
       return null;
     }
 
-    const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
     return data.publicUrl;
   } catch (err) {
     console.error(`Image download failed for index ${index}:`, err);
@@ -59,7 +65,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
     }
 
-    const scrapedData = await scrapeAmazonProduct(result.data.url);
+    // Extract clean /dp/ASIN URL
+    const asinMatch = result.data.url.match(/\/dp\/([A-Z0-9]{10})/i);
+    const cleanUrl = asinMatch
+      ? `https://www.amazon.in/dp/${asinMatch[1]}`
+      : result.data.url;
+
+    let scrapedData;
+    try {
+      scrapedData = await scrapeAmazonProduct(cleanUrl);
+    } catch (scrapeError: any) {
+      // If scraping fails with 503/blocked, return structured error
+      const msg = scrapeError.message || '';
+      if (msg.includes('503') || msg.includes('CAPTCHA') || msg.includes('robot')) {
+        return NextResponse.json({
+          error: '⚠️ Amazon blocked this request right now. This happens sometimes. Wait 30–60 seconds and try again with a different product URL, or use "Add Product" to enter details manually.'
+        }, { status: 503 });
+      }
+      if (msg.includes('price')) {
+        return NextResponse.json({
+          error: '⚠️ Could not read the price from this Amazon page. Try a different product URL or add the product manually.'
+        }, { status: 422 });
+      }
+      throw scrapeError;
+    }
+
     const supabase = createClient(true);
 
     let slug = generateSlug(scrapedData.name);
@@ -67,7 +97,6 @@ export async function POST(request: Request) {
     let counter = 1;
     let finalSlug = slug;
 
-    // Slug uniqueness check
     while (!isUnique) {
       const { data } = await supabase.from('products').select('id').eq('slug', finalSlug).single();
       if (!data) {
@@ -78,24 +107,25 @@ export async function POST(request: Request) {
       }
     }
 
-    // Re-upload images
-    const uploadedImages: string[] = [];
-    for (let i = 0; i < scrapedData.images.length; i++) {
-      const publicUrl = await reuploadImageToSupabase(scrapedData.images[i], supabase, finalSlug, i);
-      if (publicUrl) uploadedImages.push(publicUrl);
-    }
+    // Re-upload images to Supabase (parallel, max 6)
+    const imagePromises = scrapedData.images.slice(0, 6).map((imgUrl, i) =>
+      reuploadImageToSupabase(imgUrl, supabase, finalSlug, i)
+    );
+    const uploadedImages = (await Promise.all(imagePromises)).filter(Boolean) as string[];
 
     return NextResponse.json({
       success: true,
       product: {
         ...scrapedData,
         slug: finalSlug,
-        images: uploadedImages, // Replace amazon URLs with our Supabase public URLs
+        images: uploadedImages,
       }
     });
 
   } catch (error: any) {
     console.error('Scraping error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to scrape product' }, { status: 500 });
+    return NextResponse.json({
+      error: error.message || 'Failed to scrape product. Try again or add the product manually.'
+    }, { status: 500 });
   }
 }
