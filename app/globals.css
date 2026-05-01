@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Brand ─────────────────────────────────── */
+    --color-brand-cyan:       #06B6D4;
+    --color-brand-cyan-dark:  #0891B2;
+    --color-brand-amber:      #F59E0B;
+    --color-brand-amber-dark: #D97706;
+    --color-brand-navy:       #0A0E1A;
+    --color-brand-navy-mid:   #0F172A;
+
+    /* ── Storefront (Light Body) ───────────────── */
+    --color-bg-body:          #F1F5F9;
+    --color-bg-card:          #FFFFFF;
+    --color-bg-card-hover:    #FAFBFC;
+    --color-text-primary:     #0F172A;
+    --color-text-secondary:   #475569;
+    --color-text-muted:       #94A3B8;
+    --color-border:           #E2E8F0;
+
+    /* ── Semantic Colors ───────────────────────── */
+    --color-success:          #10B981;
+    --color-warning:          #F59E0B;
+    --color-error:            #EF4444;
+    --color-info:             #3B82F6;
+
+    /* ── Admin Dashboard ───────────────────────── */
+    --color-admin-header:     #0A0E1A;
+    --color-admin-bg:         #F1F5F9;
+    --color-admin-card:       #FFFFFF;
+    --color-admin-border:     #E2E8F0;
+
+    /* ── shadcn/ui Variables (Light) ──────────── */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 38 92% 50%; /* Amber */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* We don't strictly use a full dark mode globally, but keep variables valid */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 38 92% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[var(--color-bg-body)] text-[var(--color-text-primary)] font-body;
+  }
+}
+
+/* ── Custom Utilities & Animations ───────────────── */
+[data-category="all"]          { background: linear-gradient(135deg, #1E293B 0%, #334155 100%); }
+[data-category="smartphones"]  { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); }
+[data-category="tablets"]      { background: linear-gradient(135deg, #1E40AF 0%, #6366F1 100%); }
+[data-category="accessories"]  { background: linear-gradient(135deg, #701A75 0%, #EC4899 100%); }
+[data-category="smartwatches"] { background: linear-gradient(135deg, #92400E 0%, #F59E0B 100%); }
+[data-category="audio"]        { background: linear-gradient(135deg, #4C1D95 0%, #8B5CF6 100%); }
+[data-category="laptops"]      { background: linear-gradient(135deg, #064E3B 0%, #10B981 100%); }
+[data-category="other"]        { background: linear-gradient(135deg, #1F2937 0%, #6B7280 100%); }
+
+.hero-bg {
+  position: sticky;
+  top: 0;
+  transform: translateZ(0);
+}
+.hero-blob-1 {
+  animation: blob-float 8s ease-in-out infinite;
+  will-change: transform;
+}
+.hero-blob-2 {
+  animation: blob-float 10s ease-in-out infinite reverse;
+  will-change: transform;
+}
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -30px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+[data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+[data-animate].animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate]:nth-child(1) { transition-delay: 0ms; }
+[data-animate]:nth-child(2) { transition-delay: 80ms; }
+[data-animate]:nth-child(3) { transition-delay: 160ms; }
+[data-animate]:nth-child(4) { transition-delay: 240ms; }
+
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(6, 182, 212, 0.15), 0 8px 16px -8px rgba(0,0,0,0.1);
+}
+
+.btn-primary:active { transform: scale(0.97); }
+
+/* Hide scrollbar for category scroll */
+.scrollbar-hide::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide,
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Slide up animation for hero text */
+.slide-up-element {
+  animation: slideUp 0.7s ease both;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulse glow for cart badge */
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(34, 211, 238, 0); }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Slide in from left (mobile menu) */
+.slide-in {
+  animation: slideIn 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Safe area padding for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
