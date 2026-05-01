@@ -7,9 +7,9 @@ import { z } from 'zod';
 
 const requestSchema = z.object({
   url: z.string().url().refine(
-    (val) => val.includes('amazon.in') && /\/dp\/[A-Z0-9]{10}/i.test(val),
+    (val) => (val.includes('amazon.in') && /\/dp\/[A-Z0-9]{10}/i.test(val)) || val.includes('flipkart.com'),
     {
-      message: "❌ That's a search results page URL. Please open a specific product on Amazon, then copy the URL from your browser address bar. It must contain /dp/ in it.",
+      message: "❌ Invalid URL. Please provide a direct Amazon.in product link (with /dp/) or a Flipkart.com product link.",
     }
   ),
 });
@@ -73,7 +73,8 @@ export async function POST(request: Request) {
 
     let scrapedData;
     try {
-      scrapedData = await scrapeAmazonProduct(cleanUrl);
+      const { scrapeProduct } = await import('@/lib/scraper');
+      scrapedData = await scrapeProduct(result.data.url);
     } catch (scrapeError: any) {
       // If scraping fails with 503/blocked, return structured error
       const msg = scrapeError.message || '';

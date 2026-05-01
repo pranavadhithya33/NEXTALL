@@ -23,13 +23,17 @@ export function AmazonScraper({ onSaved }: { onSaved: () => void }) {
   ];
 
   const handleScrape = async () => {
-    const isDirectUrl = /\/dp\/[A-Z0-9]{10}/i.test(url);
-    if (!url || !url.includes('amazon.in')) {
-      setError('Please enter a valid amazon.in URL');
+    const isAmazon = url.includes('amazon.in');
+    const isFlipkart = url.includes('flipkart.com');
+    const isAmazonDirect = /\/dp\/[A-Z0-9]{10}/i.test(url);
+
+    if (!url || (!isAmazon && !isFlipkart)) {
+      setError('Please enter a valid Amazon.in or Flipkart.com URL');
       return;
     }
-    if (!isDirectUrl) {
-      setError("❌ That's a search results page. Please open a specific product, then copy its URL (must contain /dp/).");
+
+    if (isAmazon && !isAmazonDirect) {
+      setError("❌ That's an Amazon search results page. Please open a specific product, then copy its URL (must contain /dp/).");
       return;
     }
 
@@ -64,9 +68,9 @@ export function AmazonScraper({ onSaved }: { onSaved: () => void }) {
             <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-amber-900 mb-2">One-Click Auto-Upload from Amazon</h2>
+            <h2 className="text-xl font-bold text-amber-900 mb-2">Auto-Import from Amazon & Flipkart</h2>
             <p className="text-amber-800/80 mb-6 max-w-3xl text-sm">
-              Paste any Amazon India product URL. We will automatically fetch the Title, High-Resolution Images, Live Price, and Complete Specifications — then apply your discounts automatically.
+              Paste any Amazon India or Flipkart product URL. We will automatically fetch the Title, Images, Price, and Specifications — then apply your discounts automatically.
             </p>
 
             <div className="flex gap-3">

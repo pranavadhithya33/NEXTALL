@@ -30,7 +30,17 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ products, total: count });
+    return NextResponse.json(
+      { products, total: count },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -19,7 +19,10 @@ export default function HomePage() {
     return `/api/public/products?page=${pageIndex + 1}&limit=12`;
   };
 
-  const { data, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher);
+  const { data, size, setSize, isValidating, mutate } = useSWRInfinite(getKey, fetcher, {
+    refreshInterval: 10000, // Revalidate every 10 seconds to show new products
+    revalidateOnFocus: true
+  });
   
   const products = data ? data.flatMap(page => page.products) : [];
   const isLoadingMore = isValidating && size > 0;
