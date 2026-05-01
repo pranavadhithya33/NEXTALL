@@ -94,8 +94,15 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md md:hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-4/5 max-w-sm bg-[#0A0E1A] shadow-2xl flex flex-col slide-in border-r border-white/10">
+        <div 
+          className="fixed inset-0 z-[999] bg-[#000000e6] backdrop-blur-md md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div 
+            className="absolute left-0 top-0 bottom-0 w-[280px] shadow-2xl flex flex-col slide-in border-r border-white/10"
+            style={{ backgroundColor: '#0A0E1A !important', background: '#0A0E1A' }}
+            onClick={e => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center p-4 border-b border-white/10">
               <span className="text-xl font-display font-bold">NEXT<span className="text-cyan-400">ALL</span></span>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-400 hover:text-white">
