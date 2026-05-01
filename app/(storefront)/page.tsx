@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import axios from 'axios';
 import Link from 'next/link';
@@ -79,36 +79,44 @@ export default function HomePage() {
         </h2>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {products.map((product: Product) => (
-            <Link href={`/product/${product.slug}`} key={product.id} className="group bg-[#111827] rounded-2xl border border-white/5 overflow-hidden hover:border-cyan-500/50 transition-all hover:shadow-[0_0_30px_rgba(34,211,238,0.15)] flex flex-col h-full">
-              <div className="relative aspect-square bg-white p-4">
-                {product.images?.[0] && (
-                  <Image 
-                    src={product.images[0]} 
-                    alt={product.name} 
-                    fill 
-                    className="object-contain group-hover:scale-105 transition-transform duration-500" 
-                    unoptimized 
-                  />
-                )}
-                <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                  -{Math.round(((product.original_price - product.prepaid_price) / product.original_price) * 100)}%
-                </div>
-              </div>
-              <div className="p-4 flex flex-col flex-grow">
-                <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">{product.brand}</div>
-                <h3 className="font-medium text-white mb-2 line-clamp-2 leading-snug group-hover:text-cyan-400 transition-colors flex-grow">
-                  {product.name}
-                </h3>
-                <div className="mt-auto">
-                  <div className="text-xs text-gray-500 line-through mb-0.5">₹{product.original_price.toLocaleString('en-IN')}</div>
-                  <div className="text-lg font-bold text-white flex items-center gap-2">
-                    ₹{product.prepaid_price.toLocaleString('en-IN')}
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded text-nowrap">Prepaid</span>
+          {data?.map((page, i) => (
+            <Fragment key={i}>
+              {page.products.map((product: Product) => (
+                <Link 
+                  href={`/product/${product.slug}`} 
+                  key={product.id} 
+                  className="group bg-[#111827] rounded-2xl border border-white/5 overflow-hidden hover:border-cyan-500/50 transition-all hover:shadow-[0_0_30px_rgba(34,211,238,0.15)] flex flex-col h-full"
+                >
+                  <div className="relative aspect-square bg-white p-4">
+                    {product.images?.[0] && (
+                      <Image 
+                        src={product.images[0]} 
+                        alt={product.name} 
+                        fill 
+                        className="object-contain group-hover:scale-105 transition-transform duration-500" 
+                        unoptimized 
+                      />
+                    )}
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                      -{Math.round(((product.original_price - product.prepaid_price) / product.original_price) * 100)}%
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Link>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">{product.brand}</div>
+                    <h3 className="font-medium text-white mb-2 line-clamp-2 leading-snug group-hover:text-cyan-400 transition-colors flex-grow">
+                      {product.name}
+                    </h3>
+                    <div className="mt-auto">
+                      <div className="text-xs text-gray-500 line-through mb-0.5">₹{product.original_price.toLocaleString('en-IN')}</div>
+                      <div className="text-lg font-bold text-white flex items-center gap-2">
+                        ₹{product.prepaid_price.toLocaleString('en-IN')}
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded text-nowrap">Prepaid</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </Fragment>
           ))}
         </div>
 
