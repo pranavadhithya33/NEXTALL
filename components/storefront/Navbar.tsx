@@ -26,16 +26,12 @@ export function Navbar() {
         { icon: Home, label: "Home", href: "/" },
         { icon: Package, label: "Orders", href: "/orders" },
         { icon: Truck, label: "Track Order", href: "/track" },
-        { icon: LayoutGrid, label: "Category", href: "/#categories" },
       ]
     },
     {
       group: "ACCOUNT",
       items: [
-        { icon: User, label: "My Account", href: isLoggedIn ? "/profile" : "/login" },
         { icon: Heart, label: "Wishlist", href: "/wishlist" },
-        { icon: MapPin, label: "Addresses", href: "/addresses" },
-        { icon: CreditCard, label: "Payment Methods", href: "/payments" },
       ]
     },
     {
@@ -43,7 +39,6 @@ export function Navbar() {
       items: [
         { icon: HelpCircle, label: "Help Center", href: "/help" },
         { icon: Phone, label: "Contact Us", href: "/contact" },
-        { icon: Info, label: "About Us", href: "/about" },
       ]
     }
   ];
