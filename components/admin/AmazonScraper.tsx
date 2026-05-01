@@ -23,8 +23,13 @@ export function AmazonScraper({ onSaved }: { onSaved: () => void }) {
   ];
 
   const handleScrape = async () => {
+    const isDirectUrl = /\/dp\/[A-Z0-9]{10}/i.test(url);
     if (!url || !url.includes('amazon.in')) {
       setError('Please enter a valid amazon.in URL');
+      return;
+    }
+    if (!isDirectUrl) {
+      setError("❌ That's a search results page. Please open a specific product, then copy its URL (must contain /dp/).");
       return;
     }
 

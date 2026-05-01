@@ -60,18 +60,33 @@ async function fetchWithRetry(url: string, attempt = 1): Promise<string> {
     if (response.data.includes('Type the characters you see in this image') || 
         response.data.includes('robot check') ||
         response.data.includes('validateCaptcha')) {
-      if (attempt < 3) {
-        // Wait 2 seconds and retry with different UA
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        return fetchWithRetry(url, attempt + 1);
-      }
-      throw new Error('Amazon is showing a CAPTCHA. Please try again in a few minutes.');
+      throw new Error('CAPTCHA_DETECTED');
     }
     
     return response.data;
   } catch (error: any) {
-    if (attempt < 3 && (error.code === 'ECONNABORTED' || error.response?.status === 503 || error.response?.status === 429)) {
-      await new Promise(resolve => setTimeout(resolve, 3000 * attempt));
+    // If it's a CAPTCHA or a block (503/403/429), try proxy on second attempt
+    const isBlock = error.message === 'CAPTCHA_DETECTED' || 
+                   error.response?.status === 503 || 
+                   error.response?.status === 403 || 
+                   error.response?.status === 429 ||
+                   error.code === 'ECONNABORTED';
+
+    if (attempt === 1 && isBlock) {
+      console.log('Direct fetch blocked or timed out, trying proxy...');
+      try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const proxyRes = await axios.get(proxyUrl, { timeout: 30000 });
+        return proxyRes.data;
+      } catch (proxyError) {
+        console.error('Proxy fetch also failed:', proxyError);
+        // Fallback to retry logic if proxy fails
+      }
+    }
+
+    if (attempt < 3) {
+      const delay = isBlock ? 2000 : 5000;
+      await new Promise(resolve => setTimeout(resolve, delay * attempt));
       return fetchWithRetry(url, attempt + 1);
     }
     throw error;

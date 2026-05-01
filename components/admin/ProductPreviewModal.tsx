@@ -11,7 +11,7 @@ import { Product } from '@/types';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { Trash2, Plus, Upload, Link2, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Upload, Link2, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   product: Partial<Product> | null;
@@ -88,6 +88,14 @@ export function ProductPreviewModal({ product, isOpen, onClose, onSaved }: Props
     handleChange('images', (formData.images || []).filter((_, i) => i !== index));
   };
 
+  const handleSetMain = (index: number) => {
+    const images = [...(formData.images || [])];
+    const [selected] = images.splice(index, 1);
+    images.unshift(selected);
+    handleChange('images', images);
+    toast.success('Main image updated');
+  };
+
   const handleSave = async () => {
     if (!formData.name) { toast.error('Product name is required'); return; }
     if (!formData.original_price) { toast.error('Amazon MRP price is required'); return; }
@@ -137,16 +145,35 @@ export function ProductPreviewModal({ product, isOpen, onClose, onSaved }: Props
 
             <div className="grid grid-cols-3 gap-2 min-h-[120px]">
               {images.map((img, i) => (
-                <div key={i} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group border border-gray-200">
+                <div key={i} className="relative aspect-square bg-white rounded-lg overflow-hidden group border border-gray-200 hover:border-amber-400 transition-all shadow-sm">
                   <Image src={img} alt={`Image ${i + 1}`} fill className="object-contain p-1" unoptimized />
-                  <button
-                    className="absolute top-1 right-1 bg-red-500 text-white p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleRemoveImage(i)}
-                  >
-                    <Trash2 size={12} />
-                  </button>
+                  
+                  {/* Hover Controls */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    {i !== 0 && (
+                      <Button 
+                        size="icon" 
+                        variant="secondary" 
+                        className="h-7 w-7 bg-white/90 hover:bg-white"
+                        onClick={() => handleSetMain(i)}
+                        title="Set as main image"
+                      >
+                        <CheckCircle2 size={14} className="text-emerald-600" />
+                      </Button>
+                    )}
+                    <Button 
+                      size="icon" 
+                      variant="destructive" 
+                      className="h-7 w-7 bg-red-500/90 hover:bg-red-500"
+                      onClick={() => handleRemoveImage(i)}
+                      title="Remove image"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+
                   {i === 0 && (
-                    <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-[10px] px-1 rounded">Main</span>
+                    <span className="absolute top-1 left-1 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">Main</span>
                   )}
                 </div>
               ))}
